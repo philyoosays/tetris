@@ -1,0 +1,28 @@
+.border, .board {
+  width: 30px;
+  height: 30px;
+  display: inline-block;
+  padding: 0;
+  vertical-align: top;
+}
+.container {
+  width: 360px;
+  height: 660px;
+  display: block;
+  margin: 0 auto;
+}
+
+.screen{
+  position: absolute;
+  width: 300px;
+  height: 600px;
+  margin: 30px;
+}
+
+.border {
+  background: gray;
+}
+
+.board {
+  background: black;
+}

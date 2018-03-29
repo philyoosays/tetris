@@ -119,8 +119,9 @@ line cleanup function will remove completed lines and push the landscape above i
 
 | Component | Priority | Estimated Time | Actual Time |
 | --- | :---: |  :---: | :---: |
-| create board | H | .5hr |  |
-| keypress and border detection | H | .5hr |  |
+| create board | H | .5hr | .5hr |
+| keypress and border detection | H | .5hr | .5hr |
+| landscape and detection | H | 2hr |  |
 | completed lines and logic | H | 4hr |  |
 | Landing Page | H | 1hr |  |
 | Object gravity | H | 1hr |  |
@@ -128,7 +129,7 @@ line cleanup function will remove completed lines and push the landscape above i
 | score counter | H | .5hr |  |
 | Highscore List | H | 1hr |  |
 | debugging | H | 10hr |  |
-| Total |  | 29.5hrs |  |
+| Total |  | 31.5hrs |  |
 
 
 
