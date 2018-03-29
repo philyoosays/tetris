@@ -4,25 +4,16 @@ let xVelocity = 0;
 let borderLeft = false;
 let borderRight = false;
 let objects = [
-  {color: 'orange', xy: [{x: 6, y: 1}, {x: 5, y: 1}, {x: 5, y: 2}, {x: 5, y: 3}]},
-  {color: 'orange', xy: [{x: 5, y: 2}, {x: 5, y: 1}, {x: 4, y: 1}, {x: 3, y: 1}]},
-
-
-
-  {color: 'blue', xy: [{x: 4, y: 1}, {x: 5, y: 1}, {x: 5, y: 2}, {x: 5, y: 3}]},
-  {color: 'lightblue', xy: [{x: 5, y: 1}, {x: 5, y: 2}, {x: 5, y: 3}, {x: 5, y: 4}]},
-  {color: 'yellow', xy: [{x: 4, y: 1}, {x: 5, y: 1}, {x: 4, y: 2}, {x: 5, y: 2}]},
-  {color: 'red', xy: [{x: 4, y: 1}, {x: 5, y: 1}, {x: 5, y: 2}, {x: 6, y: 2}]},
-
+  {color: 'orange', xy: [{x: 6, y: 1}, {x: 5, y: 2}, {x: 5, y: 3}, {x: 5, y: 1}]},
+  {color: 'blue', xy: [{x: 4, y: 1}, {x: 5, y: 2}, {x: 5, y: 3}, {x: 5, y: 1}]},
+  {color: 'lightblue', xy: [{x: 5, y: 1}, {x: 5, y: 3}, {x: 5, y: 4}, {x: 5, y: 2}]},
+  {color: 'yellow', xy: [{x: 5, y: 1}, {x: 4, y: 2}, {x: 5, y: 2}, {x: 4, y: 1}]},
+  {color: 'red', xy: [{x: 4, y: 1}, {x: 5, y: 1}, {x: 6, y: 2}, {x: 5, y: 2}]},
   {color: 'green', xy: [{x: 6, y: 1}, {x: 5, y: 1}, {x: 4, y: 2}, {x: 5, y: 2}]},
-  {color: 'green', xy: [{x: 6, y: 1}, {x: 5, y: 1}, {x: 4, y: 2}, {x: 5, y: 2}]},
-
-
-
-  {color: 'purple', xy: [{x: 5, y: 1}, {x: 4, y: 2}, {x: 5, y: 2}, {x: 6, y: 2}]},
-]
-// orange is right L
-// blue is left L
+  {color: 'purple', xy: [{x: 5, y: 1}, {x: 4, y: 2}, {x: 6, y: 2}, {x: 5, y: 2}]},
+];
+// orange is right L (hanging orientation)
+// blue is left L (hanging orientation)
 // lightblue is bar
 // yellow is box
 // red is left S
@@ -30,12 +21,13 @@ let objects = [
 // purple is T
 
 let activeObj = [];
-let activeDetails = '';
+let activeColor = '';
 let gravityTime = 15;
 let gravityCounter = 0;
 let gravity = 1;
 let landEdgeTimer = 0;
 let lineDoneTimer = 0;
+let score = 0;
 
 function createBoard() {
   for (let y = 0; y < gridHeight + 2; y += 1) {
@@ -63,9 +55,10 @@ function labelEdges() {
 
 function newObject() {
   if (activeObj.length === 0) {
+    debugger;
     let random = Math.floor(Math.random() * objects.length);
     activeObj = objects[random].xy;
-    activeDetails += objects[random].color;
+    activeColor += objects[random].color;
   }
 }
 
@@ -85,6 +78,7 @@ function drawLandscape() {
 function placeObj() {
   for (let i = 0; i < activeObj.length; i += 1) {
     $(`#x${activeObj[i].x}y${activeObj[i].y}`).addClass('object');
+    // $(`#x${activeObj[i].x}y${activeObj[i].y}`).addClass(activeColor);
   }
 }
 
@@ -92,7 +86,8 @@ function objGravity() {
   if (gravityCounter === gravityTime && activeObj.length > 0) {
     gravityCounter = 0;
     activeObj.forEach((v) => {
-      $(`#x${v.x}y${v.y}`).removeClass('object')
+      $(`#x${v.x}y${v.y}`).removeClass('object');
+      // $(`#x${v.x}y${v.y}`).removeClass(activeColor);
       v.y += gravity;
     });
   }
@@ -100,8 +95,9 @@ function objGravity() {
 
 function lateral() {
   activeObj.forEach((v) => {
-    $(`#x${v.x}y${v.y}`).removeClass('object')
-      v.x += xVelocity;
+    $(`#x${v.x}y${v.y}`).removeClass('object');
+    // $(`#x${v.x}y${v.y}`).removeClass(activeColor);
+    v.x += xVelocity;
   });
   xVelocity = 0;
 }
@@ -133,10 +129,68 @@ function landDetect() {
   }
 }
 
+// left +d -d
+// down -d -d
+// right -d +d
+// up +d +d
+
 function rotate() {
-  let pivot = activeObj[1];
-  // x' = xCOS90deg - ySINtheta
-  // y' = yCOStheta + xSINtheta
+  let pivot = activeObj[activeObj.length - 1];
+  let distance = [];
+  for (let i = 0; i < activeObj.length - 1; i++) {
+    distance.push({x: pivot.x - activeObj[i].x, y: pivot.y - activeObj[i].y});
+  }
+  for (let i = 0; i < distance.length; i++) {
+    activeObj[i].x += distance[i].x;
+    activeObj[i].y -= distance[i].x;
+    activeObj[i].x += distance[i].y;
+    activeObj[i].y += distance[i].y;
+  }
+  // border left
+  let theX = activeObj[0].x;
+  activeObj.forEach((v) => {
+    if (v.x < theX) {
+      theX = v.x;
+    }
+  });
+  if (theX < 1) {
+    activeObj.forEach((v) => {
+      v.x += Math.abs(theX)+1
+    });
+  }
+  // border right
+  activeObj.forEach((v) => {
+    if (v.x > theX) {
+      theX = v.x;
+    }
+  });
+  if (theX > 10) {
+    activeObj.forEach((v) => {
+      v.x -= Math.abs(theX-10);
+    });
+  }
+  // bottom end translation
+  let theY = activeObj[activeObj.length - 1].y;
+  activeObj.forEach((v) => {
+    if (v.y > theY) {
+      theY = v.y;
+    }
+  });
+  if (theY > activeObj[activeObj.length - 1].y) {
+    activeObj.forEach((v) => {
+      v.y -= (theY - activeObj[activeObj.length - 1].y - 1);
+    });
+  }
+  // landedge barrier
+
+}
+
+function biggestY(varY) {
+    activeObj.forEach((v) => {
+    if (v.y > varY) {
+      varY = v.y;
+    }
+  });
 }
 
 function lineDetect() {
@@ -195,7 +249,7 @@ function gameOver() {
 
 }
 
- window.onload = function () {
+window.onload = function () {
   createBoard();
   // generateLand();
   $(document).keydown(keyPress);
@@ -203,6 +257,7 @@ function gameOver() {
 }
 
 function game() {
+
   cleanLineDone();
   drawLandscape();
   newObject();
@@ -211,6 +266,9 @@ function game() {
   objGravity();
   placeObj();
   landDetect();
+  // if(activeObj.length === 0){
+  //   debugger;
+  // }
   lineDetect();
   console.log(activeObj);
   gravityCounter++;
@@ -237,3 +295,21 @@ function keyPress(button) {
       break;
   }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

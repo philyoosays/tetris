@@ -32,3 +32,32 @@
   box-sizing: border-box;
   border: 1px solid black;
 }
+
+.orange {
+  background: orange;
+}
+
+.blue {
+  background: blue;
+}
+
+.lightblue {
+  background: lightblue;
+}
+
+.yellow {
+  background: yellow;
+}
+
+.red {
+  background: red;
+}
+
+.green {
+  background: green;
+}
+
+.purple {
+  background: purple;
+}
+
