@@ -26,3 +26,9 @@
 .board {
   background: black;
 }
+
+.object, .landscape {
+  background: orange;
+  box-sizing: border-box;
+  border: 1px solid black;
+}
