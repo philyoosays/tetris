@@ -20,9 +20,30 @@ h2 {
   margin: 20px 0 0 0;
 }
 
-input {
+h6 {
+  font-family: 'Press Start 2P', serif;
+  color: white;
+  display: inline-block;
+  padding: 0 20px;
+  margin: 20px 0 0 0;
+}
+
+input.name {
   display: block;
   margin: 0 auto;
+}
+
+.tank > p:nth-of-type(1) {
+  width: 150px;
+  margin: 100px auto 0 auto;
+}
+
+.diffradios > input {
+  margin: 0 38px;
+}
+
+.diffTank > div {
+  display: block;
 }
 
 .buttons > p:hover {
@@ -104,13 +125,19 @@ input {
 .object {
   background: blue;
   box-sizing: border-box;
-  border: 1px solid black;
+  border-bottom: 2px solid rgb(20,20,20);
+  border-left: 2px solid rgb(50,50,50);
+  border-right: 2px solid rgb(120,120,120);
+  border-top: 2px solid rgb(140,140,140);
 }
 
 div.landscape {
   background: orange;
   box-sizing: border-box;
-  border: 1px solid black;
+  border-bottom: 2px solid rgb(20,20,20);
+  border-left: 2px solid rgb(50,50,50);
+  border-right: 2px solid rgb(120,120,120);
+  border-top: 2px solid rgb(140,140,140);
   -webkit-transition: all 1s linear;
   -moz-transition: all 1s linear;
   -o-transition: all 1s linear;

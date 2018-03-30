@@ -64,14 +64,14 @@ let objects = [
 // block of code. It's up here because it had to be a global variable
 // so I could use clearInterval in the gameOver function to stop the game.
 
-const gravityTime = 20;
+let gravityTime = 20;
 let gravityCounter = 0;
 let gravity = 1;
 const landEdgeDuration = 30;
 let landEdgeTimer = 0;
 let lineDoneTimer = 0;
 let scoreTimer = 0;
-let scoreTimerAdjust = 15;
+let scoreTimerAdjust = 5;
 let score = 0;
 const scoreIncrement = 5;
 const deathHeight = 3;
@@ -79,6 +79,7 @@ let playerName = '';
 let titleAnimation;
 let scoreHistory = [{ name: 'Jim', playerscore: 30 }, { name: 'Phil', playerscore: 50 }, { name: 'Gamer', playerscore: 14 }, { name: 'Jimbo', playerscore: 28 }, { name: 'Jim', playerscore: 30 }, { name: 'Phil', playerscore: 50 }, { name: 'Gamer', playerscore: 14 }, { name: 'Jimbo', playerscore: 28 }, { name: 'Gamer', playerscore: 14 }, { name: 'Jimbo', playerscore: 28 }, { name: 'Jim', playerscore: 30 }, { name: 'Phil', playerscore: 50 }, { name: 'Gamer', playerscore: 14 }, { name: 'Jimbo', playerscore: 28 }];
 let runGame;
+let scoreTemp;
 
 // Creates the board and border divs, it colors the death height, and displays the score.
 function createBoard() {
@@ -158,8 +159,9 @@ function placeObj() {
 }
 
 function objGravity() {
-  if(parseInt(score/50) > 0){
-    gravityTime - parseInt(score/50);
+  if(parseInt(scoreTemp/50) > 0){
+    gravityTime -= 1;
+    scoreTemp = 0;
   }
   if (gravityCounter === gravityTime && activeObj.length > 0) {
     gravityCounter = 0;
@@ -349,7 +351,7 @@ function cleanLineDone() {
           $(`#x${x}y${y-1}`).removeClass(clone);
           $(`#x${x}y${y-1}`).addClass('linedone');
           $(`#x${x}y${y-1}`).addClass('board');
-          labelEdges()
+          labelEdges();
         }
       }
     }
@@ -379,7 +381,7 @@ function gameOver() {
 }
 
 function gameOverScreen() {
-  let entry = { name: playerName, playerScore: score, id: scoreHistory.length};
+  let entry = { name: playerName, playerscore: score, id: scoreHistory.length};
   scoreHistory.push(entry);
   let container = $('<div>').addClass('buttons');
   container.appendTo('.screen');
@@ -392,31 +394,25 @@ function gameOverScreen() {
   message.appendTo('.buttons');
   displayScore.appendTo('.buttons');
   homeButton.appendTo('.buttons');
+  score = 0;
 }
-
-// function errorDetection() {
-//   if($('.object.landscape').length > 0 || ($('.object').length < 4 && $('.object').length > 0)) {
-//     $('.object').removeClass('object');
-//     gravity = 1;
-//     activeObj = [];
-//     alert(`Error - `);
-//   }
-// }
 
 function scoreFunc() {
   // if ($('.linedone').length === 0) {
   //   scoreAdded = false;
   // }
   // if (!scoreAdded) {
-  if ($('.linedone').length > 0 && scoreTimer < scoreTimerAdjust) {
-    scoreTimer++;
-  }
-  if (scoreTimer === scoreTimerAdjust) {
-    score += ($('.linedone').length/10) * scoreIncrement;
-    // console.log(`.linedone ${$('.linedone').length}`);
-    // console.log(`Score should be ${($('.linedone').length/10)*scoreIncrement}`);
-    revealScore();
-  }
+  // if ($('.linedone').length > 0 && scoreTimer < scoreTimerAdjust) {
+  //   scoreTimer++;
+  // }
+  // if (scoreTimer === scoreTimerAdjust) {
+  // debugger;
+  score += ($('.linedone').length/10) * scoreIncrement;
+  scoreTemp += ($('.linedone').length/10) * scoreIncrement;
+  // console.log(`.linedone ${$('.linedone').length}`);
+  // console.log(`Score should be ${($('.linedone').length/10)*scoreIncrement}`);
+  revealScore();
+  // }
   // scoreAdded = true;
   // }
 }
@@ -492,7 +488,7 @@ function landingPage() {
   newGame.click(nameScreen);
   newGame.addClass('newgame');
   newGame.appendTo(buttons);
-  options.click(optionScreen);
+  // options.click(optionScreen);
   options.addClass('options');
   options.appendTo(buttons);
   scores.addClass('scores');
@@ -533,7 +529,7 @@ function nameScreen() {
   let container = $('<div>').addClass('jar');
   container.appendTo('.screen');
   let label = $('<p>').html('Enter your name');
-  let input = $('<input>');
+  let input = $('<input>').addClass('name');
   let button = $('<h2>').html('SUBMIT');
   button.click(startGame);
   input.keydown((button) => {
@@ -555,7 +551,9 @@ function startGame() {
 }
 
 function sortScore() {
-  scoreHistory.sort((a, b) => return -a.playerscore + b.playerscore;);
+  scoreHistory.sort((a, b) => {
+    return -a.playerscore + b.playerscore;
+  });
 }
 
 function highScore() {
@@ -585,14 +583,29 @@ function optionScreen() {
   clearInterval(titleAnimation);
   $('.screen').empty();
   let container = $('<div>').addClass('tank');
-  let label = $('<p>').html('Starting Difficulty');
-  let input = $('<input>');
-  let button = $('<h2>').html('SUBMIT');
-  // button.click(startGame);
-  label.appendTo(container);
+  container.appendTo('.screen');
+  // let diffTank = $('<div>').addClass('difftank');
+  // diffTank.appendTo('.tank');
+  let diffLabel = $('<p>').html('Starting Difficulty');
+  diffLabel.appendTo('.tank');
+  let labelBox = $('<div>').addClass('difflabels');
+  labelBox.appendTo('.tank');
+  $('<h6>').html('Hard').appendTo('.difflabels');
+  $('<h6>').html('Medium').appendTo('.difflabels');
+  $('<h6>').html('Easy').appendTo('.difflabels');
+  let diffRadio = $('<div>').addClass('diffradios');
+  diffRadio.appendTo('.tank');
   let diffHard = $('<input>').attr('type', 'radio');
-  let diffMedium = ('<input>').attr('type', 'radio');
-  let diffEasy = ('<input>').attr('type', 'radio')
+  diffHard.attr('name', 'difficulty');
+  diffHard.appendTo('.diffradios');
+  let diffMedium = $('<input>').attr('type', 'radio');
+  diffMedium.attr('name', 'difficulty');
+  diffMedium.appendTo('.diffradios');
+  let diffEasy = $('<input>').attr('type', 'radio');
+  diffEasy.attr('name','difficulty');
+  diffEasy.appendTo('.diffradios');
+
+  // diffEasy.appendTo('.difftank');
 }
 
 
