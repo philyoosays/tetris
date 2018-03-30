@@ -20,7 +20,7 @@ let yVelocity = 0;
 let borderLeft = false;
 let borderRight = false;
 let borderBottom = false;
-// let activeColor = '';
+let activeColor = '';
 let activeObj = [];
 let objects = [
   {color: 'orange', xy: [{x: 6, y: 1}, {x: 5, y: 2}, {x: 5, y: 3}, {x: 5, y: 1}]},
@@ -64,7 +64,7 @@ let objects = [
 // block of code. It's up here because it had to be a global variable
 // so I could use clearInterval in the gameOver function to stop the game.
 
-const gravityTime = 10;
+const gravityTime = 20;
 let gravityCounter = 0;
 let gravity = 1;
 const landEdgeDuration = 30;
@@ -75,6 +75,9 @@ let scoreTimerAdjust = 15;
 let score = 0;
 const scoreIncrement = 5;
 const deathHeight = 3;
+let playerName = '';
+let titleAnimation;
+let scoreHistory = [{ name: 'Jim', playerscore: 30 }, { name: 'Phil', playerscore: 50 }, { name: 'Gamer', playerscore: 14 }, { name: 'Jimbo', playerscore: 28 }, { name: 'Jim', playerscore: 30 }, { name: 'Phil', playerscore: 50 }, { name: 'Gamer', playerscore: 14 }, { name: 'Jimbo', playerscore: 28 }, { name: 'Gamer', playerscore: 14 }, { name: 'Jimbo', playerscore: 28 }, { name: 'Jim', playerscore: 30 }, { name: 'Phil', playerscore: 50 }, { name: 'Gamer', playerscore: 14 }, { name: 'Jimbo', playerscore: 28 }];
 let runGame;
 
 // Creates the board and border divs, it colors the death height, and displays the score.
@@ -94,8 +97,7 @@ function createBoard() {
     }
   }
   // draws the death height line
- deathLine()
-  $('<h3>').appendTo('.screen');
+  deathLine();
   revealScore();
 }
 
@@ -110,10 +112,11 @@ function deathLine() {
 // Updates the score above the game board.
 function revealScore() {
   let scoreString = score +'';
-  for (let i = scoreString.length; i < 3; i++) {
+  for (let i = scoreString.length; i < 4; i++) {
     scoreString = '0' + scoreString;
   }
   $('h3').html(`SCORE: ${scoreString}`);
+  return scoreString;
 }
 
 function labelEdges() {
@@ -126,7 +129,7 @@ function labelEdges() {
 function newObject() {
   if (activeObj.length === 0) {
     let random = Math.floor(Math.random() * objects.length);
-    // activeColor = objects[random].color;
+    activeColor = objects[random].color;
     objects[random].xy.forEach((v) => {
       activeObj.push({x: v.x, y: v.y});
     });
@@ -150,11 +153,14 @@ function drawLandscape() {
 function placeObj() {
   for (let i = 0; i < activeObj.length; i += 1) {
     $(`#x${activeObj[i].x}y${activeObj[i].y}`).addClass('object');
-    // $(`#x${activeObj[i].x}y${activeObj[i].y}`).addClass(activeColor);
+    $(`#x${activeObj[i].x}y${activeObj[i].y}`).addClass(activeColor);
   }
 }
 
 function objGravity() {
+  if(parseInt(score/50) > 0){
+    gravityTime - parseInt(score/50);
+  }
   if (gravityCounter === gravityTime && activeObj.length > 0) {
     gravityCounter = 0;
     let theY = activeObj[0].y
@@ -173,7 +179,7 @@ function objGravity() {
     }
     activeObj.forEach((v) => {
       $(`#x${v.x}y${v.y}`).removeClass('object');
-      // $(`#x${v.x}y${v.y}`).removeClass(activeColor);
+      $(`#x${v.x}y${v.y}`).removeClass(activeColor);
       v.y += gravity;
     });
   }
@@ -190,7 +196,7 @@ function movement() {
   });
   activeObj.forEach((v) => {
     $(`#x${v.x}y${v.y}`).removeClass('object');
-    // $(`#x${v.x}y${v.y}`).removeClass(activeColor);
+    $(`#x${v.x}y${v.y}`).removeClass(activeColor);
     v.x += xVelocity;
     v.y += yVelocity;
   });
@@ -198,6 +204,8 @@ function movement() {
   yVelocity = 0;
 }
 
+// This function works by disabling the arrow keys if
+// border conditions are met.
 function borderDetect() {
   if ($('.leftedge.object').length === 0) {
     borderLeft = false;
@@ -209,13 +217,15 @@ function borderDetect() {
   } else if ($('.rightedge.object').length > 0) {
     borderRight = true;
   }
-  theBiggestY()
   if ($('.landedge.object').length === 0) {
     borderBottom = false;
   } else if ($('.landedge.object').length > 0) {
     borderBottom = true;
-  // } else if( )
-}
+  } else if (gravityCounter > gravityTime-3) {
+    borderBottom = true;
+  } else if ($('.landedge.object').length > 0) {
+    borderBottom = true;
+  }
 }
 
 function landDetect() {
@@ -226,6 +236,7 @@ function landDetect() {
   if (landEdgeTimer === landEdgeDuration && $('.landedge.object').length > 0) {
     activeObj = [];
     $('.object').addClass('landscape');
+    $('.object').removeClass(activeColor);
     $('.object').removeClass('object');
     landEdgeTimer = 0;
     gravity = 1;
@@ -280,13 +291,20 @@ function rotate() {
   // landedge barrier
   while ($('.landscape.object').length > 0) {
     console.log(true)
+    gravity = 0
+    $('.object').removeClass(activeColor);
+    $('.object').removeClass('object');
     activeObj.forEach((v) => {
-      v.y -= 2;
-      gravity = 1;
+      v.y -= 1;
+      $(`#x${v.x}y${v.y}`).addClass('object');
+      $(`#x${v.x}y${v.y}`).addClass(activeColor);
     });
+    gravity = 1;
   }
 }
 
+// This is a helper function used in other functions to find the
+// lowest point of any active object
 function theBiggestY() {
   let biggestY = activeObj[activeObj.length - 1].y;
   activeObj.forEach((v) => {
@@ -320,6 +338,7 @@ function cleanLineDone() {
   if (lineDoneTimer !== 10) {
     lineDoneTimer = 0;
     $('.linedone').removeClass('landscape');
+    $('.object').removeClass(activeColor);
     $('.object').removeClass('object');
     for (let y = gridHeight; y >= 1; y -= 1) {
       for (let x = 1; x <= gridWidth; x += 1) {
@@ -354,35 +373,51 @@ function generateLand() {
 function gameOver() {
   if ($('.death.landscape').length > 0) {
     clearInterval(runGame);
-    alert('You lose');
+    gameOverScreen();
     return true;
   }
 }
 
-function errorDetection() {
-  if($('.object.landscape').length > 0 || ($('.object').length < 4 && $('.object').length > 0)) {
-    $('.object').removeClass('object');
-    gravity = 1;
-    activeObj = [];
-    alert(`Error - `);
-  }
+function gameOverScreen() {
+  let entry = { name: playerName, playerScore: score, id: scoreHistory.length};
+  scoreHistory.push(entry);
+  let container = $('<div>').addClass('buttons');
+  container.appendTo('.screen');
+  $('h3').remove();
+  let message = $('<h2>').html('GAME OVER!');
+  let displayScore = $('<p>').html(`Score: ${revealScore()}`);
+  let homeButton = $('<p>').html('HOME');
+  homeButton.click(landingPage);
+  $(document).keydown(landingPage);
+  message.appendTo('.buttons');
+  displayScore.appendTo('.buttons');
+  homeButton.appendTo('.buttons');
 }
+
+// function errorDetection() {
+//   if($('.object.landscape').length > 0 || ($('.object').length < 4 && $('.object').length > 0)) {
+//     $('.object').removeClass('object');
+//     gravity = 1;
+//     activeObj = [];
+//     alert(`Error - `);
+//   }
+// }
 
 function scoreFunc() {
   // if ($('.linedone').length === 0) {
   //   scoreAdded = false;
   // }
   // if (!scoreAdded) {
-    if($('.linedone').length > 0 && scoreTimer < scoreTimerAdjust) {
-      scoreTimer++;
-    }
-    if(scoreTimer = scoreTimerAdjust) {
-      score += ($('.linedone').length/10) * scoreIncrement;
-      console.log(`.linedone ${$('.linedone').length}`);
-      console.log(`Score should be ${($('.linedone').length/10)*scoreIncrement}`);
-      revealScore();
-    }
-    // scoreAdded = true;
+  if ($('.linedone').length > 0 && scoreTimer < scoreTimerAdjust) {
+    scoreTimer++;
+  }
+  if (scoreTimer === scoreTimerAdjust) {
+    score += ($('.linedone').length/10) * scoreIncrement;
+    // console.log(`.linedone ${$('.linedone').length}`);
+    // console.log(`Score should be ${($('.linedone').length/10)*scoreIncrement}`);
+    revealScore();
+  }
+  // scoreAdded = true;
   // }
 }
 
@@ -390,7 +425,9 @@ window.onload = function () {
   createBoard();
   // generateLand();
   $(document).keydown(keyPress);
-  runGame = setInterval(game, 1000/30);
+  // runGame = setInterval(game, 1000/30);
+  // landingPage();
+  optionScreen();
 }
 
 function game() {
@@ -431,17 +468,132 @@ function keyPress(button) {
       }
       break;
     default:
-      debugger;
+      // debugger;
       break;
   }
 }
 
+function landingPage() {
+  sortScore();
+  $('.screen').empty();
+  $('.landscape').removeClass('landscape');
+  $(document).unbind('keydown', landingPage);
+  let screen = $('.screen');
+  let title = $('<h1>').html('<span class="l1">T</span><span class="l2">E</span><span class="l3">T</span><span class="l4">R</span><span class="l5">I</span><span class="l6">S</span>');
+  let buttons = $('<div>').addClass('buttons');
+  let newGame = $('<p>').html('NEW GAME');
+  let options = $('<p>').html('OPTIONS');
+  let scores = $('<div>');
+  let scoreTitle = $('<h2>').html('HIGHSCORES');
+  let col1 = $('<div>').addClass('col1');
+  let col2 = $('<div>').addClass('col2');
+  title.appendTo(screen);
+  buttons.appendTo(screen);
+  newGame.click(nameScreen);
+  newGame.addClass('newgame');
+  newGame.appendTo(buttons);
+  options.click(optionScreen);
+  options.addClass('options');
+  options.appendTo(buttons);
+  scores.addClass('scores');
+  scores.appendTo(screen);
+  scoreTitle.appendTo(scores);
+  $('<hr>').appendTo(scores);
+  col1.appendTo(scores);
+  col2.appendTo(scores);
+  highScore();
+  titleAnimation = setInterval(cycleTitle,1000/3);
+}
 
+function cycleTitle() {
+  var firstClass;
+  for (let i = 1; i <= $('span').length; i++) {
+    if (i === 1) {
+      firstClass = document.querySelectorAll('span')[0].classList;
+      let newClass = document.querySelectorAll('span')[$('span').length-1].classList;
+      $(`span:nth-of-type(${i})`).removeClass(firstClass[0]);
+      $(`span:nth-of-type(${i})`).addClass(newClass[0]);
+    }
+    if (i < $('span').length) {
+      let newClass = document.querySelectorAll('span')[i].classList;
+      let oldClass = document.querySelectorAll('span')[i-1].classList;
+      $(`span:nth-of-type(${i})`).removeClass(oldClass[0]);
+      $(`span:nth-of-type(${i})`).addClass(newClass[0]);
+    } else {
+      let oldClass = document.querySelectorAll('span')[i-1].classList;
+      $(`span:nth-of-type(${i})`).removeClass(oldClass[0]);
+      $(`span:nth-of-type(${i})`).addClass(firstClass[0]);
+    }
+  }
+}
 
+function nameScreen() {
+  clearInterval(titleAnimation);
+  $('.screen').empty();
+  let container = $('<div>').addClass('jar');
+  container.appendTo('.screen');
+  let label = $('<p>').html('Enter your name');
+  let input = $('<input>');
+  let button = $('<h2>').html('SUBMIT');
+  button.click(startGame);
+  input.keydown((button) => {
+    if(button.keyCode === 13) {
+      startGame();
+    }
+  });
+  label.appendTo(container);
+  input.appendTo(container);
+  button.appendTo(container);
+}
 
+function startGame() {
+  playerName = $('input').val();
+  $('.screen').empty();
+  $('<h3>').appendTo('.screen');
+  revealScore();
+  runGame = setInterval(game, 1000/30);
+}
 
+function sortScore() {
+  scoreHistory.sort((a, b) => return -a.playerscore + b.playerscore;);
+}
 
+function highScore() {
+  sortScore();
+  for (let i = 0; i < scoreHistory.length; i += 1) {
+    if (i < 16) {
+      let theDiv = $('<div>').addClass('list clearfix');
+      let p1 = $('<p>').addClass('playername');
+      let p2 = $('<p>').addClass('playerscore');
+      p1.html(`${scoreHistory[i].name}`);
+      p2.html(`${scoreHistory[i].playerscore}`);
+      if ($('.col1 .list').length >= 12) {
+        theDiv.appendTo('.col2');
+        p1.appendTo('.col2 .list:last-of-type');
+        p2.appendTo('.col2 .list:last-of-type');
+      } else {
+        theDiv.appendTo('.col1');
+        p1.appendTo('.col1 .list:last-of-type');
+        p2.appendTo('.col1 .list:last-of-type');
+      }
 
+    }
+  }
+}
+
+function optionScreen() {
+  clearInterval(titleAnimation);
+  $('.screen').empty();
+  let container = $('<div>').addClass('tank');
+  let label = $('<p>').html('Starting Difficulty');
+  let input = $('<input>');
+  let button = $('<h2>').html('SUBMIT');
+  // button.click(startGame);
+  label.appendTo(container);
+  let diffHard = $('<input>').attr('type', 'radio');
+  let diffMedium = ('<input>').attr('type', 'radio');
+  let diffEasy = ('<input>').attr('type', 'radio')
+}
 
 
 

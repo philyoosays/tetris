@@ -6,6 +6,75 @@
   vertical-align: top;
 }
 
+h1, h2, p {
+  font-family: 'Press Start 2P', serif;
+  color: white;
+  text-align: center;
+}
+
+hr {
+  width: 200px;
+}
+
+h2 {
+  margin: 20px 0 0 0;
+}
+
+input {
+  display: block;
+  margin: 0 auto;
+}
+
+.buttons > p:hover {
+  color: yellow;
+}
+
+.jar {
+  margin: 250px 0;
+}
+
+.clearfix::after {
+  content: "";
+  clear: both;
+  display: table;
+}
+
+.playername {
+  display: inline-block;
+  float: left;
+  margin: 2px 0;
+}
+
+.playerscore {
+  display: inline-block;
+  float: right;
+  margin: 2px 0;
+}
+
+.scores {
+  width: 300px;
+  height: 250px;
+  margin: 0;
+}
+
+.scores > div {
+  display: inline-block;
+  width: 140px;
+  height: 200px;
+  margin: 0 5px;
+}
+
+.scores p {
+  font-size: 12px;
+}
+
+.buttons {
+  display: block;
+  width: 300px;
+  height: 60px;
+  margin: 90px 0 70px 0;
+}
+
 .death {
   background: rgb(50,50,50);
 }
@@ -38,7 +107,7 @@
   border: 1px solid black;
 }
 
-.landscape {
+div.landscape {
   background: orange;
   box-sizing: border-box;
   border: 1px solid black;
@@ -66,31 +135,60 @@ h3 {
   margin: 5px;
 }
 
-/*.orange {
+h1 {
+  font-size: 40px;
+  margin: 90px 0 40px 0;
+}
+
+.l1 {
+  color: orange;
+}
+
+.l2 {
+  color: lightblue;
+}
+
+.l3 {
+  color: green;
+}
+
+.l4 {
+  color: red;
+}
+
+.l5 {
+  color: yellow;
+}
+
+.l6 {
+  color: purple;
+}
+
+.object.orange {
   background: orange;
 }
 
-.blue {
+.object.blue {
   background: blue;
 }
 
-.lightblue {
+.object.lightblue {
   background: lightblue;
 }
 
-.yellow {
+.object.yellow {
   background: yellow;
 }
 
-.red {
+.object.red {
   background: red;
 }
 
-.green {
+.object.green {
   background: green;
 }
 
-.purple {
-  background: purple;*/
+.object.purple {
+  background: purple;
 }
 
