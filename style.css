@@ -1,10 +1,15 @@
-.border, .board {
+.border, .board, .death {
   width: 30px;
   height: 30px;
   display: inline-block;
   padding: 0;
   vertical-align: top;
 }
+
+.death {
+  background: rgb(50,50,50);
+}
+
 .container {
   width: 360px;
   height: 660px;
@@ -27,13 +32,41 @@
   background: black;
 }
 
-.object, .landscape {
-  background: orange;
+.object {
+  background: blue;
   box-sizing: border-box;
   border: 1px solid black;
 }
 
-.orange {
+.landscape {
+  background: orange;
+  box-sizing: border-box;
+  border: 1px solid black;
+  -webkit-transition: all 1s linear;
+  -moz-transition: all 1s linear;
+  -o-transition: all 1s linear;
+  transition: all 1s linear;
+}
+
+.landedge {
+  /*background: red;*/
+}
+
+div.flash {
+  background: white;
+  -webkit-transition: all 2s linear;
+  -moz-transition: all 2s linear;
+  -o-transition: all 2s linear;
+  transition: all 2s linear;
+}
+
+h3 {
+  font-family: 'Press Start 2P', serif;
+  color: white;
+  margin: 5px;
+}
+
+/*.orange {
   background: orange;
 }
 
@@ -58,6 +91,6 @@
 }
 
 .purple {
-  background: purple;
+  background: purple;*/
 }
 
