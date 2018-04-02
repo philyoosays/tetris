@@ -139,6 +139,7 @@ line cleanup function will remove completed lines and push the landscape above i
 Helper functions should be generic enought that they can be reused in other applications. Use this section to document all helper functions that fall into this category.
 
 | Function | Description | 
+| --- | :---: |  :---: | :---: |
 | revealScore | Reads the global variable 'score', converts it to a string padded with zeros to 4 digits, grabs the correct DOM element and updates the score on the DOM element and returns the padded score string. |  
 | theBiggestY | For any given orientation of a falling object, this helper function finds the lowest point of the object to aid in collision detection | 
 
@@ -146,6 +147,7 @@ Helper functions should be generic enought that they can be reused in other appl
 jQuery is the only library used in this game. 
 
 ## Code Snippet
+| --- |
   | let pivot = activeObj[activeObj.length - 1]; |
   | let distance = []; |
   | for (let i = 0; i < activeObj.length - 1; i++) { |
