@@ -25,11 +25,11 @@ let activeObj = [];
 let objects = [
   {color: 'orange', xy: [{x: 6, y: 1}, {x: 5, y: 2}, {x: 5, y: 3}, {x: 5, y: 1}]},
   {color: 'blue', xy: [{x: 4, y: 1}, {x: 5, y: 2}, {x: 5, y: 3}, {x: 5, y: 1}]},
-  {color: 'lightblue', xy: [{x: 5, y: 1}, {x: 5, y: 3}, {x: 5, y: 4}, {x: 5, y: 2}]},
+  {color: 'cyan', xy: [{x: 5, y: 1}, {x: 5, y: 3}, {x: 5, y: 4}, {x: 5, y: 2}]},
   {color: 'yellow', xy: [{x: 5, y: 1}, {x: 4, y: 2}, {x: 5, y: 2}, {x: 4, y: 1}]},
   {color: 'red', xy: [{x: 4, y: 1}, {x: 5, y: 1}, {x: 6, y: 2}, {x: 5, y: 2}]},
-  {color: 'green', xy: [{x: 6, y: 1}, {x: 5, y: 1}, {x: 4, y: 2}, {x: 5, y: 2}]},
-  {color: 'purple', xy: [{x: 5, y: 1}, {x: 4, y: 2}, {x: 6, y: 2}, {x: 5, y: 2}]},
+  {color: 'lime', xy: [{x: 6, y: 1}, {x: 5, y: 1}, {x: 4, y: 2}, {x: 5, y: 2}]},
+  {color: 'magenta', xy: [{x: 5, y: 1}, {x: 4, y: 2}, {x: 6, y: 2}, {x: 5, y: 2}]},
 ];
 // orange is right L (hanging orientation)
 // blue is left L (hanging orientation. same orientation as the letter L)
@@ -64,7 +64,7 @@ let objects = [
 // block of code. It's up here because it had to be a global variable
 // so I could use clearInterval in the gameOver function to stop the game.
 
-let gravityTime = 20;
+let gravityTime = 15;
 let gravityCounter = 0;
 let gravity = 1;
 const landEdgeDuration = 30;
@@ -77,9 +77,10 @@ const scoreIncrement = 5;
 const deathHeight = 3;
 let playerName = '';
 let titleAnimation;
-let scoreHistory = [{ name: 'Jim', playerscore: 30 }, { name: 'Phil', playerscore: 50 }, { name: 'Gamer', playerscore: 14 }, { name: 'Jimbo', playerscore: 28 }, { name: 'Jim', playerscore: 30 }, { name: 'Phil', playerscore: 50 }, { name: 'Gamer', playerscore: 14 }, { name: 'Jimbo', playerscore: 28 }, { name: 'Gamer', playerscore: 14 }, { name: 'Jimbo', playerscore: 28 }, { name: 'Jim', playerscore: 30 }, { name: 'Phil', playerscore: 50 }, { name: 'Gamer', playerscore: 14 }, { name: 'Jimbo', playerscore: 28 }];
+let scoreHistory = [];
 let runGame;
 let scoreTemp;
+let linesGenerated = 0;
 
 // Creates the board and border divs, it colors the death height, and displays the score.
 function createBoard() {
@@ -108,6 +109,15 @@ function deathLine() {
     $(`#x${x}y${deathHeight}`).removeClass('board')
     $(`#x${x}y${deathHeight}`).addClass('death');
   }
+}
+
+window.onload = function () {
+  createBoard();
+  // generateLand();
+  $(document).keydown(keyPress);
+  // runGame = setInterval(game, 1000/30);
+  landingPage();
+  // optionScreen();
 }
 
 // Updates the score above the game board.
@@ -184,6 +194,9 @@ function objGravity() {
       $(`#x${v.x}y${v.y}`).removeClass(activeColor);
       v.y += gravity;
     });
+    if (yVelocity > 0) {
+      gravity = 0;
+    }
   }
 }
 
@@ -223,6 +236,7 @@ function borderDetect() {
     borderBottom = false;
   } else if ($('.landedge.object').length > 0) {
     borderBottom = true;
+    gravity = 0;
   } else if (gravityCounter > gravityTime-3) {
     borderBottom = true;
   } else if ($('.landedge.object').length > 0) {
@@ -362,13 +376,15 @@ function cleanLineDone() {
 }
 
 function generateLand() {
-  for (let y = gridHeight; y >= 12; y -= 1) {
-    for (let x = 1; x <= gridWidth; x += 1) {
-      $(`#x${x}y${y}`).addClass('landscape')
+  if (linesGenerated > 0) {
+    for (let y = gridHeight; y > 20-linesGenerated; y -= 1) {
+      for (let x = 1; x <= gridWidth; x += 1) {
+        $(`#x${x}y${y}`).addClass('landscape')
+      }
     }
-  }
-  for(let i = 0; i<10; i++){
-    $(`#x${Math.floor(Math.random()*10)+1}y${Math.floor(Math.random()*9)+12}`).removeClass('landscape');
+    for(let i = 0; i<(linesGenerated*10)/2; i++){
+      $(`#x${Math.floor(Math.random()*10)+1}y${Math.floor(Math.random()*(linesGenerated+2))+(19-linesGenerated)}`).removeClass('landscape');
+    }
   }
 }
 
@@ -395,6 +411,8 @@ function gameOverScreen() {
   displayScore.appendTo('.buttons');
   homeButton.appendTo('.buttons');
   score = 0;
+  linesGenerated = 0;
+  gravityTime = 15;
 }
 
 function scoreFunc() {
@@ -417,15 +435,6 @@ function scoreFunc() {
   // }
 }
 
-window.onload = function () {
-  createBoard();
-  // generateLand();
-  $(document).keydown(keyPress);
-  // runGame = setInterval(game, 1000/30);
-  // landingPage();
-  optionScreen();
-}
-
 function game() {
   if(gameOver() !== true) {
     cleanLineDone();
@@ -437,36 +446,36 @@ function game() {
     placeObj();
     landDetect();
     lineDetect();
-    // errorDetection();
     scoreFunc();
     gravityCounter++;
   }
 }
 
 function keyPress(button) {
-  switch (button.keyCode) {
-    case 37:
-      if (borderLeft === false) {
-        xVelocity = -1;
-      }
-      break;
-    case 38:
-      rotate();
-      break;
-    case 39:
-      if (borderRight === false) {
-        xVelocity = 1;
-      }
-      break;
-    case 40:
-      if (borderBottom === false) {
-        yVelocity = 1;
-      }
-      break;
-    default:
-      // debugger;
-      break;
-  }
+  console.log(button);
+  // switch (button.keyCode) {
+  //   case 37:
+  //     if (borderLeft === false) {
+  //       xVelocity = -1;
+  //     }
+  //     break;
+  //   case 38:
+  //     rotate();
+  //     break;
+  //   case 39:
+  //     if (borderRight === false) {
+  //       xVelocity = 1;
+  //     }
+  //     break;
+  //   case 40:
+  //     if (borderBottom === false) {
+  //       yVelocity = 1;
+  //     }
+  //     break;
+  //   default:
+  //     // debugger;
+  //     break;
+  // }
 }
 
 function landingPage() {
@@ -488,7 +497,7 @@ function landingPage() {
   newGame.click(nameScreen);
   newGame.addClass('newgame');
   newGame.appendTo(buttons);
-  // options.click(optionScreen);
+  options.click(optionScreen);
   options.addClass('options');
   options.appendTo(buttons);
   scores.addClass('scores');
@@ -546,6 +555,7 @@ function startGame() {
   playerName = $('input').val();
   $('.screen').empty();
   $('<h3>').appendTo('.screen');
+  generateLand();
   revealScore();
   runGame = setInterval(game, 1000/30);
 }
@@ -556,6 +566,10 @@ function sortScore() {
   });
 }
 
+// This is highScore function is code I borrowed from my snake game
+// Total copy and paste but it is completely functional as long as
+// you don't refresh and since I thought it was cool, it found its
+// way into this Tetris game.
 function highScore() {
   sortScore();
   for (let i = 0; i < scoreHistory.length; i += 1) {
@@ -582,39 +596,76 @@ function highScore() {
 function optionScreen() {
   clearInterval(titleAnimation);
   $('.screen').empty();
+
+  // Options screen container
   let container = $('<div>').addClass('tank');
   container.appendTo('.screen');
-  // let diffTank = $('<div>').addClass('difftank');
-  // diffTank.appendTo('.tank');
+
+  // DifficultyText
   let diffLabel = $('<p>').html('Starting Difficulty');
   diffLabel.appendTo('.tank');
+
+  // The DIV for difficulty labels
   let labelBox = $('<div>').addClass('difflabels');
   labelBox.appendTo('.tank');
+
+  // Difficulty Labels
   $('<h6>').html('Hard').appendTo('.difflabels');
   $('<h6>').html('Medium').appendTo('.difflabels');
   $('<h6>').html('Easy').appendTo('.difflabels');
-  let diffRadio = $('<div>').addClass('diffradios');
-  diffRadio.appendTo('.tank');
-  let diffHard = $('<input>').attr('type', 'radio');
+
+  // Difficulty radiobox DIV
+  let diffRadio = $('<div>').addClass('diffradios').appendTo('.tank');
+  $('.diffradios').blur(optionsSubmit);
+
+  // Hard radio box
+  let diffHard = $('<input>').attr('type', 'radio').addClass('diffhard');
   diffHard.attr('name', 'difficulty');
   diffHard.appendTo('.diffradios');
-  let diffMedium = $('<input>').attr('type', 'radio');
+
+  // Medium radio box
+  let diffMedium = $('<input>').attr('type', 'radio').addClass('diffmedium');
   diffMedium.attr('name', 'difficulty');
   diffMedium.appendTo('.diffradios');
-  let diffEasy = $('<input>').attr('type', 'radio');
+
+  // Easy radio box
+  let diffEasy = $('<input>').attr('type', 'radio').addClass('diffeasy');
   diffEasy.attr('name','difficulty');
   diffEasy.appendTo('.diffradios');
 
-  // diffEasy.appendTo('.difftank');
+  // GENEATE RANDOM LINES Header
+  let genHeader = $('<p>').html('Generate Random Lines 0 - 10').appendTo('.tank');
+
+  // Generate lines labesl DIV
+  let genLabelsDiv = $('<div>').appendTo('.tank');
+
+  // Generate lines input
+  let genLines = $('<input>').addClass('genlines');
+  genLines.appendTo('.tank');
+
+  // Back to Home button
+  let homeButton = $('<p>').html('Back To Home').addClass('optiontohome').appendTo('.tank');
+  $('.optiontohome').click(optionsSubmit);
 }
 
+function optionsSubmit() {
+  // Difficulty buttons
+  if ($('.diffhard').prop('checked') === true) {
+    gravityTime = 5;
+  } else if($('.diffmedium').prop('checked') === true) {
+    gravityTime = 10;
+  } else if($('.diffeasy').prop('checked') === true) {
+    gravityTime = 15;
+  }
+  // Random line generator
+  if (typeof parseInt($('.genlines').val()) === 'number' && parseInt($('.genlines').val()) <= 10) {
+    linesGenerated = parseInt($('.genlines').val());
+  } else {
+    linesGenerated = 0;
+  }
+  landingPage();
+}
 
+function gameButtons() {
 
-
-
-
-
-
-
-
-
+}
