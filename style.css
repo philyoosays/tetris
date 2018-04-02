@@ -111,7 +111,11 @@ input.name {
   opacity: 0;
 }
 
-@media screen and (max-width: 800px) {
+@media screen and (device-width: 360px)
+  and (device-height: 640px)
+  and (-webkit-min-device-pixel-ratio : 4)
+  and (-webkit-device-pixel-ratio : 4)
+  and (orientation: portrait) {
   .upcontainer, .sidecontainer, .downcontainer {
     opacity: 1;
     width: 360px;
