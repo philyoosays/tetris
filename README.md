@@ -29,7 +29,7 @@ Post MVP features will allow the user to rotate the objects like the real tetris
 
 ## Wireframes
 
-https://drive.google.com/open?id=1ScbfxSSQISZpVDqGiqxKnAdcojEiO7-M
+https://drive.google.com/file/d/1iknzdBQr1CaFBv4gPLMaBtOzHWpCJQza/view?usp=sharing
 
 ## Priority Matrix
 ### Important - Lots of Time
