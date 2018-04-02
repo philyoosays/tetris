@@ -107,6 +107,11 @@ input.name {
   margin: 0 auto;
 }
 
+.genlines {
+  display: block;
+  margin: 0 auto;
+}
+
 .upcontainer, .sidecontainer, .downcontainer{
   opacity: 0;
 }
