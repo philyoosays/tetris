@@ -121,46 +121,41 @@ line cleanup function will remove completed lines and push the landscape above i
 | --- | :---: |  :---: | :---: |
 | create board | H | .5hr | .5hr |
 | keypress and border detection | H | .5hr | .5hr |
-| landscape and detection | H | 2hr |  |
-| completed lines and logic | H | 4hr |  |
-| Landing Page | H | 1hr |  |
-| Object gravity | H | 1hr |  |
-| Ending screen | H | 1hr |  |
-| score counter | H | .5hr |  |
-| Highscore List | H | 1hr |  |
-| debugging | H | 10hr |  |
-| Total |  | 31.5hrs |  |
-
-
-
-
-
-
-
+| landscape and detection | H | 2hr | 1hr |
+| completed lines and logic | H | 4hr | 2hr |
+| Landing Page | H | 1hr | 1hr |
+| Object gravity | H | 1hr | 1hr |
+| Ending screen | H | 1hr | .5hr |
+| score counter | H | .5hr | .5hr |
+| Highscore List | H | 1hr | .5hr |
+| debugging | H | 10hr | 6hr |
+| Rotation | H | 3hr | 3hr |
+| rotation w borders | H | 1hr | .5hr |
+| rotation w landscape | H | 1hr | 1hr |
+| options page | H | 1hr | 1hr |
+| Total |  | 27hrs | 24.5hr |
 
 ## Helper Functions
 Helper functions should be generic enought that they can be reused in other applications. Use this section to document all helper functions that fall into this category.
 
 | Function | Description | 
-| --- | :---: |  
-| Capitalize | This will capitalize the first letter in a string | 
+| revealScore | Reads the global variable 'score', converts it to a string padded with zeros to 4 digits, grabs the correct DOM element and updates the score on the DOM element and returns the padded score string. |  
+| theBiggestY | For any given orientation of a falling object, this helper function finds the lowest point of the object to aid in collision detection | 
 
 ## Additional Libraries
- Use this section to list all supporting libraries and thier role in the project. 
+jQuery is the only library used in this game. 
 
 ## Code Snippet
+  let pivot = activeObj[activeObj.length - 1];
+  let distance = [];
+  for (let i = 0; i < activeObj.length - 1; i++) {
+    distance.push({x: pivot.x - activeObj[i].x, y: pivot.y - activeObj[i].y});
+  }
+  for (let i = 0; i < distance.length; i++) {
+    activeObj[i].x += distance[i].x;
+    activeObj[i].y -= distance[i].x;
+    activeObj[i].x += distance[i].y;
+    activeObj[i].y += distance[i].y;
+  }
 
-Use this section to include a brief code snippet of functionality that you are proud of an a brief description.  
-
-## jQuery Discoveries
- Use this section to list some, but not all, of the jQuery methods and\or functionality discovered while working on this project.
-
-## Change Log
- Use this section to document what changes were made and the reasoning behind those changes.  
-
-## Issues and Resolutions
- Use this section to list of all major issues encountered and their resolution.
-
-#### SAMPLE.....
-**ERROR**: app.js:34 Uncaught SyntaxError: Unexpected identifier                                
-**RESOLUTION**: Missing comma after first object in sources {} object
+This code is what is responsible for rotating the objects in a clockwise motion. It computes the distance to an arbitrarily selected pivot square on each given objects and then selects the correct place in the grid to go despite its relative position to the pivot. I'm proud of this coude because I didn't have to program any exceptions (ex: a square is both above and left of the center.).
