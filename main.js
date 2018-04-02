@@ -115,6 +115,7 @@ window.onload = function () {
   createBoard();
   // generateLand();
   $(document).keydown(keyPress);
+  gameButtons();
   // runGame = setInterval(game, 1000/30);
   landingPage();
   // optionScreen();
@@ -451,31 +452,42 @@ function game() {
   }
 }
 
+function leftArrow() {
+  if (borderLeft === false) {
+    xVelocity = -1;
+  }
+}
+
+function rightArrow() {
+  if (borderRight === false) {
+    xVelocity = 1;
+  }
+}
+
+function downArrow() {
+  if (borderBottom === false) {
+    yVelocity = 1;
+  }
+}
+
 function keyPress(button) {
-  console.log(button);
-  // switch (button.keyCode) {
-  //   case 37:
-  //     if (borderLeft === false) {
-  //       xVelocity = -1;
-  //     }
-  //     break;
-  //   case 38:
-  //     rotate();
-  //     break;
-  //   case 39:
-  //     if (borderRight === false) {
-  //       xVelocity = 1;
-  //     }
-  //     break;
-  //   case 40:
-  //     if (borderBottom === false) {
-  //       yVelocity = 1;
-  //     }
-  //     break;
-  //   default:
-  //     // debugger;
-  //     break;
-  // }
+  switch (button.keyCode) {
+    case 37:
+      leftArrow();
+      break;
+    case 38:
+      rotate();
+      break;
+    case 39:
+      rightArrow();
+      break;
+    case 40:
+      downArrow();
+      break;
+    default:
+      // debugger;
+      break;
+  }
 }
 
 function landingPage() {
@@ -667,5 +679,38 @@ function optionsSubmit() {
 }
 
 function gameButtons() {
-
+  let containerUp = $('<div>').addClass('upcontainer');
+  let containerSide = $('<div>').addClass('sidecontainer');
+  let containerDown = $('<div>').addClass('downcontainer');
+  containerUp.appendTo('body');
+  containerSide.appendTo('body');
+  containerDown.appendTo('body');
+  let upButton = $('<div>').html('⬆︎').addClass('mobilebutton');
+  upButton.click(rotate);
+  upButton.appendTo('.upcontainer');
+  let leftButton = $('<div>').html('⬅︎').addClass('mobilebutton leftbutton');
+  upButton.click(leftArrow);
+  leftButton.appendTo('.sidecontainer');
+  let rightButton = $('<div>').html('➡︎').addClass('mobilebutton rightbutton');
+  rightButton.click(rightArrow);
+  rightButton.appendTo('.sidecontainer');
+  let downButton = $('<div>').html('⬇︎').addClass('mobilebutton');
+  downButton.click(downArrow);
+  downButton.appendTo('.downcontainer');
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
