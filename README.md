@@ -171,9 +171,9 @@ This code is what is responsible for rotating the objects in a clockwise motion.
  .addClass() and .removeClass() - This was used to keep track of gameplay data and object positions
 
 ## Change Log
- -creating gameboard
- -object definitions
- -keypress function
+-creating gameboard
+-object definitions
+-keypress function
  -label edges and landscape for border detection
  -randomly select objects from the definitions library
  -create object gravity
