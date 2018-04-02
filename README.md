@@ -139,7 +139,7 @@ line cleanup function will remove completed lines and push the landscape above i
 Helper functions should be generic enought that they can be reused in other applications. Use this section to document all helper functions that fall into this category.
 
 | Function | Description | 
-| --- | :---: |  :---: | :---: |
+| --- | :---: |\n
 | revealScore | Reads the global variable 'score', converts it to a string padded with zeros to 4 digits, grabs the correct DOM element and updates the score on the DOM element and returns the padded score string. |  
 | theBiggestY | For any given orientation of a falling object, this helper function finds the lowest point of the object to aid in collision detection | 
 
