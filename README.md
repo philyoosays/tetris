@@ -139,32 +139,35 @@ line cleanup function will remove completed lines and push the landscape above i
 Helper functions should be generic enought that they can be reused in other applications. Use this section to document all helper functions that fall into this category.
 
 | Function | Description | 
-| --- | :---: |\n
-| revealScore | Reads the global variable 'score', converts it to a string padded with zeros to 4 digits, grabs the correct DOM element and updates the score on the DOM element and returns the padded score string. |  
+
+| revealScore | Reads the global variable 'score', converts it to a string padded with zeros to 4 digits, grabs the correct DOM element and updates the score on the DOM element and returns the padded score string. | 
+
 | theBiggestY | For any given orientation of a falling object, this helper function finds the lowest point of the object to aid in collision detection | 
 
 ## Additional Libraries
 jQuery is the only library used in this game. 
 
 ## Code Snippet
-| --- |
-  | let pivot = activeObj[activeObj.length - 1]; |
-  | let distance = []; |
-  | for (let i = 0; i < activeObj.length - 1; i++) { |
-  |  distance.push({x: pivot.x - activeObj[i].x, y: pivot.y - activeObj[i].y}); |
-  | } |
-  | for (let i = 0; i < distance.length; i++) { |
-  |   activeObj[i].x += distance[i].x; |
-  |   activeObj[i].y -= distance[i].x; |
-  |   activeObj[i].x += distance[i].y; |
-  |   activeObj[i].y += distance[i].y; |
-  | } |
+
+  let pivot = activeObj[activeObj.length - 1];
+  let distance = [];
+  for (let i = 0; i < activeObj.length - 1; i++) {
+    distance.push({x: pivot.x - activeObj[i].x, y: pivot.y - activeObj[i].y});
+  }
+  for (let i = 0; i < distance.length; i++) {
+    activeObj[i].x += distance[i].x;
+    activeObj[i].y -= distance[i].x;
+    activeObj[i].x += distance[i].y;
+    activeObj[i].y += distance[i].y;
+  }
 
 This code is what is responsible for rotating the objects in a clockwise motion. It computes the distance to an arbitrarily selected pivot square on each given objects and then selects the correct place in the grid to go despite its relative position to the pivot. I'm proud of this coude because I didn't have to program any exceptions (ex: a square is both above and left of the center.).
 
 ## jQuery Discoveries
  $('') - This game really REALLY makes sure of the selectors to compute game logic and to detect collisions.
+ 
  .html() - I used .html to create my landing, nameScreen, optionsScreen, and gameOver pages. This method was also used to update the score during gameplay.
+ 
  .addClass() and .removeClass() - This was used to keep track of gameplay data and object positions
 
 ## Change Log
