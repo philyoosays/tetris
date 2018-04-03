@@ -170,7 +170,7 @@ function placeObj() {
 }
 
 function objGravity() {
-  if(parseInt(scoreTemp/50) > 0){
+  if (parseInt(scoreTemp/50) > 0) {
     gravityTime -= 1;
     scoreTemp = 0;
   }
@@ -190,14 +190,14 @@ function objGravity() {
     if ($(`#x${theX}y${theY + gravity}`).hasClass('border')) {
       gravity = 0;
     }
+    if (yVelocity > 0) {
+      gravity = 0;
+    }
     activeObj.forEach((v) => {
       $(`#x${v.x}y${v.y}`).removeClass('object');
       $(`#x${v.x}y${v.y}`).removeClass(activeColor);
       v.y += gravity;
     });
-    if (yVelocity > 0) {
-      gravity = 0;
-    }
   }
 }
 
@@ -307,7 +307,6 @@ function rotate() {
   }
   // landedge barrier
   while ($('.landscape.object').length > 0) {
-    console.log(true)
     gravity = 0
     $('.object').removeClass(activeColor);
     $('.object').removeClass('object');

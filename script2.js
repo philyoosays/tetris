@@ -12,13 +12,13 @@ let borderBottom = false;
 let activeColor = '';
 let activeObj = [];
 let objects = [
-  {color: 'orange', xy: [{x: 6, y: 1}, {x: 5, y: 2}, {x: 5, y: 3}, {x: 5, y: 1}]},
-  {color: 'blue', xy: [{x: 4, y: 1}, {x: 5, y: 2}, {x: 5, y: 3}, {x: 5, y: 1}]},
-  {color: 'cyan', xy: [{x: 5, y: 1}, {x: 5, y: 3}, {x: 5, y: 4}, {x: 5, y: 2}]},
-  {color: 'yellow', xy: [{x: 5, y: 1}, {x: 4, y: 2}, {x: 5, y: 2}, {x: 4, y: 1}]},
-  {color: 'red', xy: [{x: 4, y: 1}, {x: 5, y: 1}, {x: 6, y: 2}, {x: 5, y: 2}]},
-  {color: 'lime', xy: [{x: 6, y: 1}, {x: 5, y: 1}, {x: 4, y: 2}, {x: 5, y: 2}]},
-  {color: 'magenta', xy: [{x: 5, y: 1}, {x: 4, y: 2}, {x: 6, y: 2}, {x: 5, y: 2}]},
+  {color: 'orange', xy: [{x: 5, y: 0}, {x: 4, y: 1}, {x: 4, y: 2}, {x: 4, y: 0}]},
+  {color: 'blue', xy: [{x: 3, y: 0}, {x: 4, y: 1}, {x: 4, y: 2}, {x: 4, y: 0}]},
+  {color: 'cyan', xy: [{x: 4, y: 0}, {x: 4, y: 2}, {x: 4, y: 3}, {x: 4, y: 1}]},
+  {color: 'yellow', xy: [{x: 4, y: 0}, {x: 3, y: 1}, {x: 4, y: 1}, {x: 3, y: 0}]},
+  {color: 'red', xy: [{x: 3, y: 0}, {x: 4, y: 0}, {x: 5, y: 1}, {x: 4, y: 1}]},
+  {color: 'lime', xy: [{x: 5, y: 0}, {x: 4, y: 0}, {x: 3, y: 1}, {x: 4, y: 1}]},
+  {color: 'magenta', xy: [{x: 4, y: 0}, {x: 3, y: 1}, {x: 5, y: 1}, {x: 4, y: 1}]},
 ];
 
 let gravityTime = 15;
@@ -63,7 +63,7 @@ function vCreateBoard() {
   for (let y = 0; y < gridHeight; y += 1) {
     gameBoard[y] = [];
     for (let x = 0; x < gridWidth; x += 1) {
-      gameBoard[y][x] = {};
+      gameBoard[y][x] = {landscape: false, object: false};
     }
   }
   vDeathLine();
@@ -78,10 +78,52 @@ function getRidOfAll(string) {
   }
 }
 
+function removeThisFromThat(original, toRemove) {
+  for (let y = 0; y < gridHeight; y++) {
+    for (let x = 0; x < gridWidth; x++) {
+      if(gameBoard[y][x][original] === true){
+        gameBoard[y][x][toRemove] = false;
+      }
+    }
+  }
+}
+
+function addThisToThat(original, toRemove) {
+  for (let y = 0; y < gridHeight; y++) {
+    for (let x = 0; x < gridWidth; x++) {
+      if(gameBoard[y][x][original] === true){
+        gameBoard[y][x][toRemove] = true;
+      }
+    }
+  }
+}
+
+function hasBothClasses(str1, str2) {
+  for (let y = 0; y < gridHeight; y++) {
+    for (let x = 0; x < gridWidth; x++) {
+      if(gameBoard[y][x][str1] === true && gameBoard[y][x][str2] === true) {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
+function hasThisClass(string) {
+  for (let y = 0; y < gridHeight; y++) {
+    for (let x = 0; x < gridWidth; x++) {
+      if(gameBoard[y][x][string] === true) {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
 function vDeathLine() {
   getRidOfAll('death');
   for (let x = 0; x < gridWidth; x++) {
-    gameBoard[deathHeight][x]['death'] = true;
+    gameBoard[deathHeight-1][x].death = true;
   }
 }
 
@@ -93,7 +135,7 @@ window.onload = function () {
   renderBoard();
   // generateLand();
   $(document).keydown(keyPress);
-  // runGame = setInterval(game, 1000/30);
+  runGame = setInterval(game, 1000/30);
   // landingPage();
   // optionScreen();
 }
@@ -111,18 +153,27 @@ function revealScore() {
 
 function labelEdges() {
   for (let y = 0; y < gridHeight; y += 1) {
-    gameBoard[y][0]['leftedge'] = true;
-    gameBoard[y][gridWidth-1]['rightedge'] = true;
+    gameBoard[y][0].leftedge = true;
+    gameBoard[y][gridWidth-1].rightedge = true;
   }
 }
 
 function renderBoard() {
+  $('.board').each((i) => {
+    $('.board')[i].style.backgroundColor = 'black';
+  });
   let divCounter = 0;
   for (let y = 0; y < gridHeight; y++) {
     for (let x = 0; x < gridWidth; x++) {
       let grid = $('.board')[divCounter];
-      if(gameBoard[y][x].death === true) {
-        grid.css('background','gray');
+      if (gameBoard[y][x].death === true) {
+        grid.style.backgroundColor = 'gray';
+      }
+      if(gameBoard[y][x].landscape === true) {
+        grid.style.backgroundColor = 'orange';
+      }
+      if(gameBoard[y][x].object === true) {
+        grid.style.backgroundColor = activeColor;
       }
       divCounter++;
     }
@@ -140,70 +191,75 @@ function newObject() {
 }
 
 function drawLandscape() {
-  $('.landedge').removeClass('landedge');
-  for (let x = 1; x <= gridWidth; x += 1) {
-    for (let y = 1; y <= gridHeight; y += 1) {
-      if ($(`#x${x}y${y}`).hasClass('landscape') && !($(`#x${x}y${y-1}`).hasClass('landscape'))) {
-        $(`#x${x}y${y-1}`).addClass('landedge');
-      } else if (y === gridHeight) {
-        $(`#x${x}y${y}`).addClass('landedge');
+  getRidOfAll('landedge');
+  for (let x = 0; x < gridWidth; x += 1) {
+    for (let y = 0; y < gridHeight; y += 1) {
+      if (gameBoard[y][x].landscape === true && !(gameBoard[y-1][x].landscape === true)) {
+        gameBoard[y-1][x].landedge = true;
+      } else if (y === gridHeight - 1) {
+        gameBoard[y][x].landedge = true;
       }
     }
   }
-  $('.landscape.landedge').removeClass('landedge');
+  for (let y = 0; y < gridHeight; y++) {
+    for (let x = 0; x < gridWidth; x++) {
+      if (gameBoard[y][x].landscape === true && gameBoard[y][x].landedge === true) {
+        gameBoard[y][x].landedge = false;
+      }
+    }
+  }
 }
 
 function placeObj() {
   for (let i = 0; i < activeObj.length; i += 1) {
-    $(`#x${activeObj[i].x}y${activeObj[i].y}`).addClass('object');
-    $(`#x${activeObj[i].x}y${activeObj[i].y}`).addClass(activeColor);
+    gameBoard[activeObj[i].y][activeObj[i].x].object = true;
   }
 }
 
 function objGravity() {
-  if(parseInt(scoreTemp/50) > 0){
+  if (parseInt(scoreTemp/50) > 0) {
     gravityTime -= 1;
     scoreTemp = 0;
   }
   if (gravityCounter === gravityTime && activeObj.length > 0) {
     gravityCounter = 0;
-    let theY = activeObj[0].y
-    let theX;
+    let theY = activeObj[0].y;
+    let theX = activeObj[0].x;
     for (let i = 1; i < activeObj.length; i++) {
       if(activeObj[i].y > theY) {
         theY = activeObj[i].y;
         theX = activeObj[i].x;
       }
     }
-    if ($(`#x${theX}y${theY + gravity}`).hasClass('border')) {
+    if (gameBoard[theY + gravity][theX].border === true) {
       gravity = 0;
     }
-    if ($(`#x${theX}y${theY + gravity}`).hasClass('border')) {
+    if (gameBoard[theY + gravity][theX].landscape === true) {
       gravity = 0;
     }
-    activeObj.forEach((v) => {
-      $(`#x${v.x}y${v.y}`).removeClass('object');
-      $(`#x${v.x}y${v.y}`).removeClass(activeColor);
-      v.y += gravity;
-    });
     if (yVelocity > 0) {
       gravity = 0;
     }
+    activeObj.forEach((v) => {
+      gameBoard[v.y][v.x].object = false;
+      v.y += gravity;
+    });
   }
 }
 
 function movement() {
   activeObj.forEach((v) => {
-    if($(`#x${v.x + xVelocity}y${v.y}`).hasClass('landscape')) {
-      xVelocity = 0;
+    if((v.x + xVelocity) >= 0 && (v.x + xVelocity) <= 9){
+      if(gameBoard[v.y][v.x + xVelocity].landscape === true) {
+        xVelocity = 0;
+      }
     }
   //   if($(`#x${v.x}y${v.y + yVelocity}`).hasClass('landscape') || $(`#x${v.x}y${v.y + yVelocity}`).hasClass('border')) {
   //     yVelocity = 0;
   //   }
   });
   activeObj.forEach((v) => {
-    $(`#x${v.x}y${v.y}`).removeClass('object');
-    $(`#x${v.x}y${v.y}`).removeClass(activeColor);
+    getRidOfAll('object');
     v.x += xVelocity;
     v.y += yVelocity;
   });
@@ -214,47 +270,47 @@ function movement() {
 // This function works by disabling the arrow keys if
 // border conditions are met.
 function borderDetect() {
-  if ($('.leftedge.object').length === 0) {
+  if (!hasBothClasses('leftedge', 'object')) {
     borderLeft = false;
-  } else if ($('.leftedge.object').length > 0) {
+  } else if (hasBothClasses('leftedge', 'object')) {
     borderLeft = true;
   }
-  if ($('.rightedge.object').length === 0) {
+  if (!hasBothClasses('rightedge', 'object')) {
     borderRight = false;
-  } else if ($('.rightedge.object').length > 0) {
+  } else if (hasBothClasses('rightedge', 'object')) {
     borderRight = true;
   }
-  if ($('.landedge.object').length === 0) {
+  if (!hasBothClasses('landedge', 'object')) {
     borderBottom = false;
-  } else if ($('.landedge.object').length > 0) {
+  } else if (hasBothClasses('landedge', 'object')) {
     borderBottom = true;
     gravity = 0;
   } else if (gravityCounter > gravityTime-3) {
     borderBottom = true;
-  } else if ($('.landedge.object').length > 0) {
+  } else if (hasBothClasses('landedge', 'object')) {
     borderBottom = true;
   }
 }
 
 function landDetect() {
-  if ($('.landedge.object').length > 0) {
+  if (hasBothClasses('landedge', 'object')) {
     gravity = 0;
     landEdgeTimer += 1;
   }
-  if (landEdgeTimer === landEdgeDuration && $('.landedge.object').length > 0) {
+  if (landEdgeTimer === landEdgeDuration && hasBothClasses('landedge', 'object')) {
     activeObj = [];
-    $('.object').addClass('landscape');
-    $('.object').removeClass(activeColor);
-    $('.object').removeClass('object');
+    addThisToThat('object', 'landscape');
+    getRidOfAll('object');
     landEdgeTimer = 0;
     gravity = 1;
-  } else if (landEdgeTimer < 45 && $('.landedge.object').length === 0) {
+  } else if (landEdgeTimer < 45 && !hasBothClasses('landedge', 'object')) {
     landEdgeTimer = 0;
     gravity = 1;
   }
 }
 
 function rotate() {
+  getRidOfAll('object');
   let pivot = activeObj[activeObj.length - 1];
   let distance = [];
   for (let i = 0; i < activeObj.length - 1; i++) {
@@ -297,15 +353,13 @@ function rotate() {
     });
   }
   // landedge barrier
-  while ($('.landscape.object').length > 0) {
-    console.log(true)
+  while (hasBothClasses('landscape', 'object')) {
     gravity = 0
-    $('.object').removeClass(activeColor);
-    $('.object').removeClass('object');
+    removeThisFromThat('object', 'activecolor')
+    getRidOfAll('object')
     activeObj.forEach((v) => {
       v.y -= 1;
-      $(`#x${v.x}y${v.y}`).addClass('object');
-      $(`#x${v.x}y${v.y}`).addClass(activeColor);
+      gameBoard[v.y][v.x].object = true;
     });
     gravity = 1;
   }
@@ -324,65 +378,66 @@ function theBiggestY() {
 }
 
 function lineDetect() {
-  for (let y = gridHeight; y >= 1; y -= 1) {
+  for (let y = gridHeight-1; y >= 0; y -= 1) {
     let counter = 0;
-    for (let x = 1; x <= gridWidth; x += 1) {
-      if ($(`#x${x}y${y}`).hasClass('landscape')) {
+    for (let x = 0; x < gridWidth; x += 1) {
+      if (gameBoard[y][x].landscape === true) {
         counter += 1;
       }
     }
     if (counter === 10) {
-      for (let x = 1; x <= gridWidth; x += 1) {
-        $(`#x${x}y${y}`).addClass('linedone');
+      for (let x = 0; x < gridWidth; x += 1) {
+        gameBoard[y][x].linedone = true;
       }
     }
   }
-  if ($('.linedone').length > 0) {
+  if (hasThisClass('linedone')) {
     lineDoneTimer += 1;
   }
 }
 
 function cleanLineDone() {
-  if (lineDoneTimer !== 10) {
+  if (lineDoneTimer === 10) {
     lineDoneTimer = 0;
-    $('.linedone').removeClass('landscape');
-    $('.object').removeClass(activeColor);
-    $('.object').removeClass('object');
-    for (let y = gridHeight; y >= 1; y -= 1) {
-      for (let x = 1; x <= gridWidth; x += 1) {
-        if ($(`#x${x}y${y}`).hasClass('linedone')) {
-          $(`#x${x}y${y}`).removeClass('linedone');
-          let clone = $(`#x${x}y${y-1}`).attr('class');
-          $(`#x${x}y${y}`).addClass(clone);
-          $(`#x${x}y${y-1}`).removeClass(clone);
-          $(`#x${x}y${y-1}`).addClass('linedone');
-          $(`#x${x}y${y-1}`).addClass('board');
+    removeThisFromThat('linedone', 'landscape');
+    getRidOfAll('object');
+    for (let y = gridHeight-1; y > 0; y -= 1) {
+      for (let x = 0; x < gridWidth; x += 1) {
+        if (gameBoard[y][x].linedone === true) {
+          gameBoard[y][x].linedone = false;
+          let temp = Object.keys(gameBoard[y-1][x]);
+          temp.forEach((v) => {
+            gameBoard[y][x][v] = gameBoard[y-1][x][v];
+            gameBoard[y-1][x][v] = false;
+          });
+          gameBoard[y-1][x].linedone = true;
+          gameBoard[y-1][x].board = true;
           labelEdges();
         }
       }
     }
+    getRidOfAll('linedone');
     placeObj();
     revealScore();
-    deathLine();
+    vDeathLine();
   }
 }
 
 function generateLand() {
   if (linesGenerated > 0) {
-    for (let y = gridHeight; y > 20-linesGenerated-2; y -= 1) {
-      for (let x = 1; x <= gridWidth; x += 1) {
-        $(`#x${x}y${y}`).addClass('landscape')
+    for (let y = gridHeight-1; y >= 20-linesGenerated; y -= 1) {
+      for (let x = 0; x < gridWidth; x += 1) {
+        gameBoard[y][x].landscape = true;
       }
     }
     for(let i = 0; i<(linesGenerated*10)/2; i++){
-      $(`#x${Math.floor(Math.random()*10)+1}y${Math.floor(Math.random()*(linesGenerated+2))+(19-linesGenerated)}`).removeClass('landscape');
-      console.log($('#x' + (Math.floor(Math.random()*9)+1) + 'y' + (Math.floor(Math.random()*9)+12) + 'is being removed'));
+      gameBoard[Math.floor(Math.random()*(linesGenerated+2))+(19-linesGenerated)][Math.floor(Math.random()*10)+1].landscape = false;
     }
   }
 }
 
 function gameOver() {
-  if ($('.death.landscape').length > 0) {
+  if (hasBothClasses('death', 'landscape')) {
     clearInterval(runGame);
     gameOverScreen();
     return true;
@@ -390,7 +445,7 @@ function gameOver() {
 }
 
 function gameOverScreen() {
-  let entry = { name: playerName, playerscore: score, id: scoreHistory.length};
+  let entry = { name: playerName, playerscore: score, id: scoreHistory.length };
   scoreHistory.push(entry);
   let container = $('<div>').addClass('buttons');
   container.appendTo('.screen');
@@ -409,17 +464,16 @@ function gameOverScreen() {
 }
 
 function scoreFunc() {
-  // if ($('.linedone').length === 0) {
-  //   scoreAdded = false;
-  // }
-  // if (!scoreAdded) {
-  // if ($('.linedone').length > 0 && scoreTimer < scoreTimerAdjust) {
-  //   scoreTimer++;
-  // }
-  // if (scoreTimer === scoreTimerAdjust) {
-  // debugger;
-  score += ($('.linedone').length/10) * scoreIncrement;
-  scoreTemp += ($('.linedone').length/10) * scoreIncrement;
+  let counter = 0;
+  for (let y = 0; y < gridHeight; y++) {
+    for (let x = 0; x < gridWidth; x++) {
+      if(gameBoard[y][x].linedone === true) {
+        counter++;
+      }
+    }
+  }
+  score += (counter/10) * scoreIncrement;
+  scoreTemp += (counter/10) * scoreIncrement;
   // console.log(`.linedone ${$('.linedone').length}`);
   // console.log(`Score should be ${($('.linedone').length/10)*scoreIncrement}`);
   revealScore();
@@ -429,7 +483,7 @@ function scoreFunc() {
 }
 
 function game() {
-  if(gameOver() !== true) {
+  if (gameOver() !== true) {
     cleanLineDone();
     drawLandscape();
     newObject();
@@ -441,6 +495,7 @@ function game() {
     lineDetect();
     scoreFunc();
     gravityCounter++;
+    renderBoard();
   }
 }
 
