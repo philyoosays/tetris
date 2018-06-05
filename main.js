@@ -105,8 +105,8 @@ function createBoard() {
 
 function deathLine() {
   $('.death').removeClass('death');
-  for (let x = 1; x <= gridWidth; x++) {
-    $(`#x${x}y${deathHeight}`).removeClass('board')
+  for (let x = 1; x <= gridWidth; x += 1) {
+    $(`#x${x}y${deathHeight}`).removeClass('board');
     $(`#x${x}y${deathHeight}`).addClass('death');
   }
 }
@@ -123,8 +123,8 @@ window.onload = function () {
 
 // Updates the score above the game board.
 function revealScore() {
-  let scoreString = score +'';
-  for (let i = scoreString.length; i < 4; i++) {
+  let scoreString = score + '';
+  for (let i = scoreString.length; i < 4; i += 1) {
     scoreString = '0' + scoreString;
   }
   $('h3').html(`SCORE: ${scoreString}`);
@@ -143,7 +143,7 @@ function newObject() {
     let random = Math.floor(Math.random() * objects.length);
     activeColor = objects[random].color;
     objects[random].xy.forEach((v) => {
-      activeObj.push({x: v.x, y: v.y});
+      activeObj.push({ x: v.x, y: v.y });
     });
   }
 }
@@ -152,8 +152,8 @@ function drawLandscape() {
   $('.landedge').removeClass('landedge');
   for (let x = 1; x <= gridWidth; x += 1) {
     for (let y = 1; y <= gridHeight; y += 1) {
-      if ($(`#x${x}y${y}`).hasClass('landscape') && !($(`#x${x}y${y-1}`).hasClass('landscape'))) {
-        $(`#x${x}y${y-1}`).addClass('landedge');
+      if ($(`#x${x}y${y}`).hasClass('landscape') && !($(`#x${x}y${y - 1}`).hasClass('landscape'))) {
+        $(`#x${x}y${y - 1}`).addClass('landedge');
       } else if (y === gridHeight) {
         $(`#x${x}y${y}`).addClass('landedge');
       }
@@ -170,25 +170,27 @@ function placeObj() {
 }
 
 function objGravity() {
-  if (parseInt(scoreTemp/50) > 0) {
+  if (parseInt(scoreTemp / 50) > 0) {
     gravityTime -= 1;
     scoreTemp = 0;
   }
   if (gravityCounter === gravityTime && activeObj.length > 0) {
     gravityCounter = 0;
-    let theY = activeObj[0].y
+    let theY = activeObj[0].y;
     let theX;
-    for (let i = 1; i < activeObj.length; i++) {
-      if(activeObj[i].y > theY) {
+    for (let i = 1; i < activeObj.length; i += 1) {
+      if (activeObj[i].y > theY) {
         theY = activeObj[i].y;
         theX = activeObj[i].x;
       }
     }
     if ($(`#x${theX}y${theY + gravity}`).hasClass('border')) {
       gravity = 0;
+      yVelocity = 0;
     }
-    if ($(`#x${theX}y${theY + gravity}`).hasClass('border')) {
+    if ($(`#x${theX}y${theY + gravity}`).hasClass('landscape')) {
       gravity = 0;
+      yVelocity = 0;
     }
     if (yVelocity > 0) {
       gravity = 0;
@@ -203,12 +205,9 @@ function objGravity() {
 
 function movement() {
   activeObj.forEach((v) => {
-    if($(`#x${v.x + xVelocity}y${v.y}`).hasClass('landscape')) {
+    if ($(`#x${v.x + xVelocity}y${v.y}`).hasClass('landscape')) {
       xVelocity = 0;
     }
-  //   if($(`#x${v.x}y${v.y + yVelocity}`).hasClass('landscape') || $(`#x${v.x}y${v.y + yVelocity}`).hasClass('border')) {
-  //     yVelocity = 0;
-  //   }
   });
   activeObj.forEach((v) => {
     $(`#x${v.x}y${v.y}`).removeClass('object');
@@ -238,7 +237,7 @@ function borderDetect() {
   } else if ($('.landedge.object').length > 0) {
     borderBottom = true;
     gravity = 0;
-  } else if (gravityCounter > gravityTime-3) {
+  } else if (gravityCounter > gravityTime - 2) {
     borderBottom = true;
   } else if ($('.landedge.object').length > 0) {
     borderBottom = true;
@@ -266,10 +265,10 @@ function landDetect() {
 function rotate() {
   let pivot = activeObj[activeObj.length - 1];
   let distance = [];
-  for (let i = 0; i < activeObj.length - 1; i++) {
-    distance.push({x: pivot.x - activeObj[i].x, y: pivot.y - activeObj[i].y});
+  for (let i = 0; i < activeObj.length - 1; i += 1) {
+    distance.push({ x: pivot.x - activeObj[i].x, y: pivot.y - activeObj[i].y });
   }
-  for (let i = 0; i < distance.length; i++) {
+  for (let i = 0; i < distance.length; i += 1) {
     activeObj[i].x += distance[i].x;
     activeObj[i].y -= distance[i].x;
     activeObj[i].x += distance[i].y;
@@ -284,7 +283,7 @@ function rotate() {
   });
   if (theX < 1) {
     activeObj.forEach((v) => {
-      v.x += Math.abs(theX)+1;
+      v.x += Math.abs(theX) + 1;
     });
   }
   // border right
@@ -295,7 +294,7 @@ function rotate() {
   });
   if (theX > 10) {
     activeObj.forEach((v) => {
-      v.x -= Math.abs(theX-10);
+      v.x -= Math.abs(theX - 10);
     });
   }
   // bottom end translation
@@ -307,7 +306,7 @@ function rotate() {
   }
   // landedge barrier
   while ($('.landscape.object').length > 0) {
-    gravity = 0
+    gravity = 0;
     $('.object').removeClass(activeColor);
     $('.object').removeClass('object');
     activeObj.forEach((v) => {
@@ -377,13 +376,13 @@ function cleanLineDone() {
 
 function generateLand() {
   if (linesGenerated > 0) {
-    for (let y = gridHeight; y > 20-linesGenerated; y -= 1) {
+    for (let y = gridHeight; y > 20 - linesGenerated; y -= 1) {
       for (let x = 1; x <= gridWidth; x += 1) {
-        $(`#x${x}y${y}`).addClass('landscape')
+        $(`#x${x}y${y}`).addClass('landscape');
       }
     }
-    for(let i = 0; i<(linesGenerated*10)/2; i++){
-      $(`#x${Math.floor(Math.random()*10)+1}y${Math.floor(Math.random()*(linesGenerated+2))+(19-linesGenerated)}`).removeClass('landscape');
+    for (let i = 0; i < (linesGenerated * 10) / 2; i += 1) {
+      $(`#x${Math.floor(Math.random() * 10) + 1}y${Math.floor(Math.random() * (linesGenerated + 2)) + (19 - linesGenerated)}`).removeClass('landscape');
     }
   }
 }
@@ -397,7 +396,7 @@ function gameOver() {
 }
 
 function gameOverScreen() {
-  let entry = { name: playerName, playerscore: score, id: scoreHistory.length};
+  let entry = { name: playerName, playerscore: score, id: scoreHistory.length };
   scoreHistory.push(entry);
   let container = $('<div>').addClass('buttons');
   container.appendTo('.screen');
@@ -416,27 +415,13 @@ function gameOverScreen() {
 }
 
 function scoreFunc() {
-  // if ($('.linedone').length === 0) {
-  //   scoreAdded = false;
-  // }
-  // if (!scoreAdded) {
-  // if ($('.linedone').length > 0 && scoreTimer < scoreTimerAdjust) {
-  //   scoreTimer++;
-  // }
-  // if (scoreTimer === scoreTimerAdjust) {
-  // debugger;
-  score += ($('.linedone').length/10) * scoreIncrement;
-  scoreTemp += ($('.linedone').length/10) * scoreIncrement;
-  // console.log(`.linedone ${$('.linedone').length}`);
-  // console.log(`Score should be ${($('.linedone').length/10)*scoreIncrement}`);
+  score += ($('.linedone').length / 10) * scoreIncrement;
+  scoreTemp += ($('.linedone').length / 10) * scoreIncrement;
   revealScore();
-  // }
-  // scoreAdded = true;
-  // }
 }
 
 function game() {
-  if(gameOver() !== true) {
+  if (gameOver() !== true) {
     cleanLineDone();
     drawLandscape();
     newObject();
@@ -447,7 +432,7 @@ function game() {
     landDetect();
     lineDetect();
     scoreFunc();
-    gravityCounter++;
+    gravityCounter += 1;
   }
 }
 
@@ -464,7 +449,7 @@ function rightArrow() {
 }
 
 function downArrow() {
-  if (borderBottom === false) {
+  if (borderBottom === false && gravityCounter !== 15) {
     yVelocity = 1;
   }
 }
@@ -518,25 +503,25 @@ function landingPage() {
   col1.appendTo(scores);
   col2.appendTo(scores);
   highScore();
-  titleAnimation = setInterval(cycleTitle,1000/3);
+  titleAnimation = setInterval(cycleTitle, 1000 / 3);
 }
 
 function cycleTitle() {
   var firstClass;
-  for (let i = 1; i <= $('span').length; i++) {
+  for (let i = 1; i <= $('span').length; i += 1) {
     if (i === 1) {
-      firstClass = document.querySelectorAll('span')[0].classList;
-      let newClass = document.querySelectorAll('span')[$('span').length-1].classList;
+      firstClass = ('span')[0].classList;
+      let newClass = document.querySelectorAll('span')[$('span').length - 1].classList;
       $(`span:nth-of-type(${i})`).removeClass(firstClass[0]);
       $(`span:nth-of-type(${i})`).addClass(newClass[0]);
     }
     if (i < $('span').length) {
       let newClass = document.querySelectorAll('span')[i].classList;
-      let oldClass = document.querySelectorAll('span')[i-1].classList;
+      let oldClass = document.querySelectorAll('span')[i - 1].classList;
       $(`span:nth-of-type(${i})`).removeClass(oldClass[0]);
       $(`span:nth-of-type(${i})`).addClass(newClass[0]);
     } else {
-      let oldClass = document.querySelectorAll('span')[i-1].classList;
+      let oldClass = document.querySelectorAll('span')[i - 1].classList;
       $(`span:nth-of-type(${i})`).removeClass(oldClass[0]);
       $(`span:nth-of-type(${i})`).addClass(firstClass[0]);
     }
@@ -553,7 +538,7 @@ function nameScreen() {
   let button = $('<h2>').html('SUBMIT');
   button.click(startGame);
   input.keydown((button) => {
-    if(button.keyCode === 13) {
+    if (button.keyCode === 13) {
       startGame();
     }
   });
